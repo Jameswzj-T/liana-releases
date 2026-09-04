@@ -1,0 +1,63 @@
+name: Bug report
+description: Report a reproducible Liana early-preview problem without private data
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请勿粘贴 API Key、私人听写正文、录音或未脱敏日志。安全问题请使用私密漏洞报告。
+  - type: input
+    id: version
+    attributes:
+      label: Liana version
+      placeholder: v0.1.0-rc.3
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac chip
+      placeholder: macOS 15.x, M2
+    validations:
+      required: true
+  - type: dropdown
+    id: route
+    attributes:
+      label: Which route was active?
+      options:
+        - Local transcription
+        - High-accuracy cloud transcription
+        - Automatic text refinement
+        - Selected-text enhancement
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Use invented or redacted text only.
+      placeholder: Tell us what you did, what appeared, and whether it happens repeatedly.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed API keys, private dictated content, recordings, and unredacted logs.
+          required: true
