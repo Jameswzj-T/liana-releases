@@ -1,94 +1,94 @@
-# Liana for macOS · Early Preview
+# Liana — speak where you work
 
-Liana 是一款面向 macOS 的本地优先听写工具：按住热键说话，松开后把文字写入当前光标处。
+Local-first dictation for your Mac. Hold a hotkey, speak, and release to insert text where you're already writing.
 
-> 当前版本是免费的早期预览版，不是已完成苹果公证的正式发行版。请先阅读下面的安装提示与隐私边界。
+[Download the free early preview](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) · [Quick start](#quick-start) · [中文简介](#中文简介) · [Feedback](https://github.com/Jameswzj-T/liana-releases/issues)
 
-- 系统：macOS 14 或更新版本
-- 设备：Apple Silicon（M 系列芯片）
-- 版本：`v0.1.0-rc.3`
-- 费用：Liana 当前不收费；主动启用第三方云服务时，可能由对应服务商向你收费
-- 签名状态：应用经过临时签名，但**尚未使用 Apple Developer ID 签名，也未经过苹果公证**
+**Apple Silicon · macOS 14 or later · v0.1.0-rc.3 · About 1.08 GB download**
 
-## 下载
+> This preview is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block the first launch. Read the installation steps before opening it. All included features are available in this free preview; optional cloud services require your own API key and may charge you separately.
 
-从 [v0.1.0-rc.3 发布页](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) 下载：
+![Using a customized Right Command shortcut: hold, speak, and release to insert text. Local dictation needs no account or API key.](assets/01-local-dictation.png)
 
-`Liana-0.1.0-rc.3-macos-arm64.zip`
+The illustration uses a custom Right Command shortcut. The new-install default is **Command + Shift + D**; you can change it in Settings.
 
-下载后可以在终端核对文件：
+## Speak into your everyday work
 
-```bash
-shasum -a 256 ~/Downloads/Liana-0.1.0-rc.3-macos-arm64.zip
-```
+- **Messages, notes, and drafts:** dictate into most macOS text fields using a global hotkey.
+- **Local by default:** the speech model is bundled. Local dictation needs no account, API key, separate model download, or Python installation.
+- **Your words, your spellings:** keep preferred names and explicit transcription corrections in a personal vocabulary. View and copy the original transcript in Liana history.
+- **Optional text cleanup:** remove fillers, uninformative repetition, and clearly withdrawn wording. For translation, concision, business tone, or restructuring, select text and approve a preview before replacement.
 
-正确的 SHA-256 是：
+English, Chinese, and mixed-language speech are supported. Names, accents, and conversational speech can still need correction; this is an early preview, not a claim of perfect recognition.
 
-```text
-601a40b010388396938d9c45deb79c3a4e18730597144c66d391454ea46c4a39
-```
+## Correct yourself. Keep talking.
 
-完整安装步骤见 [INSTALL.md](INSTALL.md)。
+In this actual English text-cleanup result, the speaker changes the recipient from Alex to Morgan. The corrected name is kept, along with the requirement to check the numbers before sending.
 
-## 它能做什么
+![Original: Send the draft to Alex, sorry, I meant Morgan, after I check the numbers. Please don't send it before that. After cleanup: Send the draft to Morgan, after I check the numbers. Please don't send it before that.](assets/02-english-cleanup.png)
 
-- 默认在本机使用 Qwen3-ASR 0.6B 完成中文、英文和中英混合听写；
-- 通过全局热键在多数 macOS 输入区域直接落字；
-- 进行确定性的断句、标点和格式清理；
-- 保存偏好拼写和明确的转写纠正规则；
-- 在本机历史记录中查看最终文本和对应原始转写；
-- 可选高准确云端转写、智能整理和选中文字增强。
+This is a real text-model response to a prepared example, not a microphone recognition test or an app screenshot. The result is shown without manual wording changes. Text cleanup is optional and cloud-based; it can be used while speech recognition stays local. Liana edits the words here—it does not send the draft for you.
 
-自动整理用于清除口头禅、无意义重复和明显的说话噪音，不应替用户重新写作。翻译、精简、
-商务表达和结构化等主动改写操作会先显示预览，只有确认后才替换文字。
+## Local by default. Cloud by choice.
 
-## 默认隐私边界
+![Local dictation keeps audio and text on your Mac. Optional cloud recognition uploads audio; optional cloud text features send text. You can view and copy the original transcript in history.](assets/03-local-and-cloud.png)
 
-新安装默认使用本地转写，不需要账户，也不上传音频或文字。
+| Feature | New-install default | What goes to a cloud provider |
+| --- | --- | --- |
+| Local dictation | On | Nothing |
+| High-accuracy cloud transcription | Off | The current recording and spelling hints |
+| Automatic text cleanup | Off | The current transcript, without audio |
+| Selected-text rewriting | Off | The selected text and your instruction text, without audio |
 
-云端能力彼此独立，只有用户主动开启并配置自己的 API Key 后才会工作：
+Cloud features require opt-in and your own provider key. Saving a key does not turn them on. Keys stay in macOS Keychain; provider retention policies and fees apply to requests you enable. [Privacy details](https://github.com/Jameswzj-T/liana-releases/blob/main/PRIVACY.md).
 
-| 能力 | 默认状态 | 发往第三方服务的内容 |
-|---|---:|---|
-| 本地听写 | 开 | 不发送 |
-| 高准确云端转写 | 关 | 当前录音及必要的拼写提示 |
-| 自动整理听写 | 关 | 当前转写文字，不含音频 |
-| 选中文字增强 | 关 | 选中文字和本次指令文字，不含音频 |
+History lets you view and copy the original transcript. It does not automatically undo text already pasted into another app.
 
-API Key 保存在 macOS Keychain。保存 Key 本身不会自动打开云端功能。详细说明见
-[PRIVACY.md](PRIVACY.md)。
+## Quick start
 
-## 免费版与未来版本
+1. Download `Liana-0.1.0-rc.3-macos-arm64.zip` and `SHA256SUMS.txt` from the [RC3 release](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3). Verify the ZIP before opening it:
 
-这次早期预览用于验证是否真的有人愿意安装并持续使用。当前安装包不设置付费墙，已有功能均可
-测试；需要第三方云服务的功能由用户自行提供 API Key。
+   ```bash
+   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.3-macos-arm64.zip
+   ```
 
-Liana 的本地听写核心计划保持免费。未来是否推出专业版、哪些云端和高级工作流进入专业版，
-会根据真实使用反馈再决定；本页不构成定价或功能承诺。
+   Expected SHA-256:
 
-## 已知限制
+   ```text
+   601a40b010388396938d9c45deb79c3a4e18730597144c66d391454ea46c4a39
+   ```
 
-- 尚未经过苹果 Developer ID 签名和公证，首次打开会看到 macOS 安全提示；
-- 目前只提供 Apple Silicon 版本；
-- 这是候选版本，尚未完成大规模用户与多台 Mac 验证；
-- 尚无自动更新，请从本仓库发布页手动下载新版本；
-- 云端能力依赖用户选择的第三方服务，其可用性、隐私条款和费用由对应服务商决定。
+   If it differs, do not open the app. Download it again from this repository. A matching hash checks that the file matches this release; it is not an Apple safety certification.
 
-## 反馈
+2. Unzip the archive and drag `Liana.app` into Applications. If macOS blocks the first launch, only proceed if you trust this preview and verified its source and hash: try opening it once, then go to **System Settings → Privacy & Security → Open Anyway**. Do not disable Gatekeeper globally. See the [full installation guide](https://github.com/Jameswzj-T/liana-releases/blob/main/INSTALL.md).
+3. Allow Microphone and Accessibility permissions when requested. These are needed to record speech, listen for the hotkey, and insert text into the current app. Restart Liana if macOS requests it.
+4. Focus a text field. Hold **Command + Shift + D** (or the dictation shortcut shown in your Settings), speak, then release. Start with local dictation; no key is needed. You can set Right Command as your shortcut to match the illustration.
 
-请在 [Issues](https://github.com/Jameswzj-T/liana-releases/issues) 提交问题。不要公开粘贴 API Key、
-私人听写正文、未脱敏日志或录音。安全问题请使用仓库的私密漏洞报告入口。
+## Before you rely on the preview
 
-这个仓库只用于公开下载、安装说明与反馈；开发源码在早期预览阶段仍保存在私有仓库中。
+- Apple Silicon only; no Intel build and no automatic updater. Get updates from this repository's releases.
+- It has not completed broad multi-Mac or long-term user validation. Focus and permission behavior can differ between apps.
+- Transcription and AI cleanup can mishear, omit, or change details. Review important names, numbers, and conditions.
+- Optional cloud availability, request handling, and costs depend on the provider you choose. Liana itself does not charge for this preview.
 
----
+## Help shape the next version
 
-## English summary
+Try it in an ordinary task, then [tell us what happened](https://github.com/Jameswzj-T/liana-releases/issues):
 
-Liana is a local-first dictation app for Apple Silicon Macs running macOS 14 or later. The default
-transcription path stays on your Mac. Optional cloud transcription and text features require explicit
-opt-in and your own API key.
+- Could you install it and complete your first dictation?
+- Which app, language, and local/cloud settings were you using?
+- Would you keep using it? What needed correcting?
 
-This free early preview is ad-hoc signed and **not Apple-notarized**. macOS may block the first launch;
-follow [INSTALL.md](INSTALL.md) only if the download and SHA-256 match this repository. Please report
-issues without including secrets or private dictated content.
+Include your Mac chip, macOS version, and Liana version when reporting a bug. Share only examples you are comfortable making public. **Do not post API keys, private dictated text, recordings, or unredacted logs.** For security issues, use [private vulnerability reporting](https://github.com/Jameswzj-T/liana-releases/security/advisories/new), not a public issue.
+
+This repository contains downloads, documentation, and feedback—not the development source code. The existing [license](https://github.com/Jameswzj-T/liana-releases/blob/main/LICENSE) and [security guidance](https://github.com/Jameswzj-T/liana-releases/blob/main/SECURITY.md) apply unchanged.
+
+## 中文简介
+
+Liana 是 macOS 本地优先听写工具：按住热键说话，松开后文字落在光标处。新安装的默认热键是 Command + Shift + D，可在设置中改成图片示范的右侧 Command。支持中文、英文和中英混说，默认本地转写，无需账号或 API Key；模型和运行环境随安装包提供。
+
+当前是免费的早期预览版，所有现有功能均可试用，不是已经过苹果 Developer ID 签名和公证的正式版。仅支持 Apple Silicon、macOS 14 及以上，下载约 1.08 GB。请按上方步骤校验文件，再参考[安装说明](https://github.com/Jameswzj-T/liana-releases/blob/main/INSTALL.md)打开。
+
+云端转写上传录音；自动整理上传文字；选中文字改写先预览、确认后替换。这些能力默认关闭，需主动启用并自备 Key，可能产生第三方费用。介绍图是流程与真实文本整理示例，不是录音识别准确率承诺。
+
+欢迎在 [Issues](https://github.com/Jameswzj-T/liana-releases/issues) 反馈安装、日常使用和实际遗漏问题。不要公开私人原文、录音、完整日志或凭据。开发源码目前仍保留在私有仓库。
