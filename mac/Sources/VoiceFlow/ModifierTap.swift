@@ -20,13 +20,20 @@ struct ModifierTap {
     private var isDown = false
     private var eligible = false
     private var keysDown: Set<UInt16> = []
+    var observedKeysDown: Set<UInt16> { keysDown }
     private var buttonsDown: Set<NSEvent.EventType> = []
 
     init(key: Key) { self.key = key }
     mutating func invalidate() { eligible = false }
+    mutating func focusChanged(modifierIsDown: Bool) {
+        // Never finish a tap that began in another focus/permission session.
+        isDown = modifierIsDown
+        eligible = false
+    }
 
     mutating func consume(type: NSEvent.EventType, keyCode: UInt16, flags: NSEvent.ModifierFlags,
-                          physicalMouseButtons: Int? = nil) -> Bool {
+                          physicalMouseButtons: Int? = nil,
+                          physicalKeysDown: Set<UInt16>? = nil) -> Bool {
         guard type == .flagsChanged else {
             if type == .keyDown { keysDown.insert(keyCode) }
             if type == .keyUp { keysDown.remove(keyCode) }
@@ -52,9 +59,13 @@ struct ModifierTap {
             guard !isDown else { return false }
             // AppKit tracking loops may consume mouseUp; reconcile before a new tap.
             if physicalMouseButtons == 0 { buttonsDown.removeAll() }
+            let hadObservedKeys = !keysDown.isEmpty
+            // Clear stale observations for the NEXT tap. The current tap stays
+            // blocked: current physical state may be newer than queued events.
+            if let physicalKeysDown { keysDown = physicalKeysDown }
             isDown = true
             eligible = flags.intersection(Self.chordModifiers) == key.flag
-                && raw & key.leftMask == 0 && keysDown.isEmpty && buttonsDown.isEmpty
+                && raw & key.leftMask == 0 && !hadObservedKeys && keysDown.isEmpty && buttonsDown.isEmpty
                 && (physicalMouseButtons ?? 0) == 0
             return false
         }

@@ -1,6 +1,18 @@
 {
   "schema_version": 1,
   "sources": {
+    "campplus_zh_en": {
+      "purpose": "optional_local_speaker_verification",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx",
+      "upstream": "https://www.modelscope.cn/models/iic/speech_campplus_sv_zh_en_16k-common_advanced",
+      "upstream_revision": "v1.0.0",
+      "checksum_source": "https://huggingface.co/csukuangfj/speaker-embedding-models/raw/0743f301363dec56491a490f6d6cbc9d67f9a3bf/3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx",
+      "license": "Apache-2.0",
+      "license_source": "https://www.modelscope.cn/models/iic/speech_campplus_sv_zh_en_16k-common_advanced/resolve/v1.0.0/README.md",
+      "license_file": "CAMplusplus-Apache-2.0.txt",
+      "license_status": "confirmed",
+      "release_status": "allowed"
+    },
     "qwen3_asr_06_8bit": {
       "purpose": "default_speech_to_text",
       "source": "https://huggingface.co/mlx-community/Qwen3-ASR-0.6B-8bit",
@@ -23,6 +35,13 @@
     "first_release": {
       "root": "app_support",
       "files": [
+        {
+          "root": "brain",
+          "path": "models/speaker/campplus.onnx",
+          "sha256": "aa3cfc16963a10586a9393f5035d6d6b57e98d358b347f80c2a30bf4f00ceba2",
+          "size": 28281164,
+          "source": "campplus_zh_en"
+        },
         {
           "root": "brain",
           "path": "models/silero_vad.onnx",

@@ -26,7 +26,8 @@ if sys.flags.optimize:
     raise RuntimeError('Run release checks without Python optimization (-O).')
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '0.1.0-rc.5'
+VERSION = '0.1.0-rc.6'
+SPEAKER_MODEL = 'models/speaker/campplus.onnx'
 
 
 def run(arguments, *, cwd=ROOT, env=None, log=None):
@@ -81,12 +82,59 @@ def payload_inventory(root):
     return result
 
 
+def verified_models(resources, manifest, speaker_model=None):
+    """Enumerate every model before copying; no implicit developer-directory fallback."""
+    result = {}
+    root = (resources / 'brain').resolve()
+    for entry in manifest['groups']['first_release']['files']:
+        relative = Path(entry['path'])
+        if relative.is_absolute() or '..' in relative.parts or str(relative) in result:
+            raise ValueError('Invalid or duplicate model path')
+        source = manifest['sources'][entry['source']]
+        if source.get('release_status') != 'allowed' or source.get('license_status') != 'confirmed':
+            raise ValueError('Model redistribution is not confirmed: ' + str(relative))
+        explicit = speaker_model is not None and str(relative) == SPEAKER_MODEL
+        model = Path(speaker_model) if explicit else root / relative
+        if model.is_symlink() or (not explicit and not model.resolve().is_relative_to(root)):
+            raise ValueError('Model input must not be a redirected link: ' + str(relative))
+        if not model.is_file():
+            raise ValueError('Missing input model: ' + str(relative))
+        if checksum(model) != entry['sha256'] or ('size' in entry and model.stat().st_size != entry['size']):
+            raise ValueError('Input model checksum/size mismatch: ' + str(relative))
+        result[str(relative)] = model
+    if SPEAKER_MODEL not in result:
+        raise ValueError('Release inventory is missing the speaker model')
+    return result
+
+
+def copy_reviewed_licenses(runtime_licenses, target, source_hashes):
+    """Retain runtime notices, and include newly reviewed source licenses as well."""
+    payload_inventory(runtime_licenses)
+    shutil.copytree(runtime_licenses, target, symlinks=True)
+    for relative, digest in source_hashes.items():
+        if not relative.startswith('THIRD_PARTY_LICENSES/'):
+            continue
+        source = ROOT / relative
+        if source.is_symlink() or checksum(source) != digest:
+            raise ValueError('Source license changed during build')
+        destination = target / Path(relative).relative_to('THIRD_PARTY_LICENSES')
+        if (destination.is_symlink() or not destination.resolve().is_relative_to(target.resolve())
+                or (destination.exists() and checksum(destination) != digest)):
+            raise ValueError('Conflicting runtime license; preserve and review both: ' + relative)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+    if not (target / 'CAMplusplus-Apache-2.0.txt').is_file():
+        raise ValueError('Speaker model license is missing from the package')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-app', type=Path, required=True,
                         help='A trusted locally audited Liana.app providing runtime/models/licenses only.')
     parser.add_argument('--output-dir', type=Path, required=True,
                         help='A new directory; existing output is never overwritten.')
+    parser.add_argument('--speaker-model', type=Path,
+                        help='Explicit, hash-verified CAM++ file when the input App predates voiceprint bundling.')
     args = parser.parse_args()
     output = args.output_dir.resolve()
     runtime_app = args.runtime_app.resolve()
@@ -106,10 +154,7 @@ def main():
     dependencies = verify_runtime(runtime_in)
     runtime_hashes = payload_inventory(runtime_in)
     model_manifest = json.loads((ROOT / 'brain/model-manifest.json').read_text())
-    for entry in model_manifest['groups']['first_release']['files']:
-        model_file = resources_in / 'brain' / entry['path']
-        if checksum(model_file) != entry['sha256']:
-            raise ValueError('Input model checksum mismatch: ' + entry['path'])
+    model_inputs = verified_models(resources_in, model_manifest, args.speaker_model)
 
     output.mkdir(parents=True)
     print('Building committed source ' + commit[:12], flush=True)
@@ -146,9 +191,9 @@ def main():
     for entry in model_manifest['groups']['first_release']['files']:
         target = brain / entry['path']
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(resources_in / 'brain' / entry['path'], target)
+        shutil.copy2(model_inputs[entry['path']], target)
         assert checksum(target) == entry['sha256']
-    shutil.copytree(resources_in / 'THIRD_PARTY_LICENSES', resources / 'THIRD_PARTY_LICENSES', symlinks=True)
+    copy_reviewed_licenses(resources_in / 'THIRD_PARTY_LICENSES', resources / 'THIRD_PARTY_LICENSES', source_hashes)
     for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
         shutil.copy2(ROOT / name, resources / name)
     (resources / 'THIRD_PARTY_PYTHON_NOTICES.md').write_text(
@@ -183,6 +228,8 @@ def main():
     relocation = json.loads((reports / 'python-relocation.json').read_text())
     if relocation['python']['version'] != '3.12.13' or relocation['python']['machine'] != 'arm64':
         raise ValueError('The bundled interpreter does not match Python 3.12.13 arm64.')
+    run([python, '-B', ROOT / 'scripts/smoke_speaker.py', '--brain-root', brain,
+         '--report', reports / 'speaker.json'], env=environment, log=reports / 'speaker-check.log')
     audit_command = [python, ROOT / 'scripts/audit_macho_dependencies.py', '--root', app,
                      '--output', reports / 'macho.json']
     try:

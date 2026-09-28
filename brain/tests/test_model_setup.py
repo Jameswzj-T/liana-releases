@@ -70,11 +70,11 @@ class ModelSetupTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             setup.model_plan(manifest, {'brain': self.root})
 
-    def test_supported_manifest_has_eight_files(self):
+    def test_supported_manifest_includes_speaker_model(self):
         import json
         manifest = json.loads((path.parents[1] / 'brain/model-manifest.json').read_text())
         plan = setup.model_plan(manifest, {'brain': self.root / 'brain', 'app_support': self.root / 'support'})
-        self.assertEqual(len(plan), 8)
+        self.assertEqual(len(plan), 9)
         self.assertTrue(all(item['url'].startswith('https://') for item in plan))
         self.assertTrue(all(len(item['sha256']) == 64 for item in plan))
 
