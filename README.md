@@ -10,9 +10,11 @@ Local-first dictation for your Mac. Tap Right Command, speak, and tap again to i
 
 > This preview is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block the first launch. Read the installation steps before opening it. All included features are available in this free preview; optional cloud services require your own API key and may charge you separately.
 
-[![Tap Right Command once to start, speak naturally, and tap again to insert. Watch the 19-second Liana demo.](assets/01-local-dictation-tap.png)](assets/liana-demo-19s.mp4)
+[![Tap Right Command once to start, speak naturally, and tap again to insert. Watch the 19-second Liana demo.](assets/01-local-dictation-tap.png)](https://github.com/user-attachments/assets/9330a221-150c-465d-ac24-d872f1cf6475)
 
-[▶ Watch the 19-second demo](assets/liana-demo-19s.mp4). An edited walkthrough with AI narration, not a real-time speed test.
+https://github.com/user-attachments/assets/9330a221-150c-465d-ac24-d872f1cf6475
+
+19-second demo. An edited walkthrough with AI narration, not a real-time speed test. [Download the video](assets/liana-demo-19s.mp4).
 
 New-install shortcuts: **Right Command** for dictation; **Right Option** for the selected-text rewrite panel. Tap, do not hold. Saved custom shortcuts are retained; both shortcuts can be changed in Settings.
 
