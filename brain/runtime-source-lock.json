@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "purpose": "Exact upstream source lock for Liana's first portable macOS arm64 runtime",
+  "target": {
+    "os": "macos",
+    "arch": "arm64",
+    "minimum_macos": "11.0",
+    "python_abi": "cp312"
+  },
+  "python": {
+    "implementation": "CPython",
+    "version": "3.12.13",
+    "distribution": "astral-sh/python-build-standalone",
+    "upstream_repository": "https://github.com/astral-sh/python-build-standalone",
+    "release_tag": "20260623",
+    "release_commit": "7f93a7d443d97f08e3afc6e24a3c675e9994b6aa",
+    "release_url": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260623",
+    "asset": {
+      "filename": "cpython-3.12.13+20260623-aarch64-apple-darwin-install_only_stripped.tar.gz",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260623/cpython-3.12.13%2B20260623-aarch64-apple-darwin-install_only_stripped.tar.gz",
+      "size_bytes": 25003823,
+      "sha256": "41df7d3ae4757e84b97874f76d634268456aaa271740d33f968d826374998fb7",
+      "archive_root": "python/"
+    },
+    "license": {
+      "spdx_summary": "PSF-2.0 and bundled historical notices",
+      "archive_path": "python/lib/python3.12/LICENSE.txt",
+      "repository_copy": "THIRD_PARTY_LICENSES/CPython-3.12.13-PSF.txt",
+      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+    }
+  },
+  "wheel_dependencies": [
+    {
+      "distribution": "sentencepiece",
+      "version": "0.2.2",
+      "filename": "sentencepiece-0.2.2-cp312-cp312-macosx_11_0_arm64.whl",
+      "url": "https://files.pythonhosted.org/packages/bd/44/caa9cab5f261a019e2808bc5046152775dc57352ba9cbae7525e9e7a1ed4/sentencepiece-0.2.2-cp312-cp312-macosx_11_0_arm64.whl",
+      "size_bytes": 1347176,
+      "sha256": "38111ed1f79268f399c505028023d5eaaf0ab4e5eafceb709468b0d3323e7838",
+      "upstream_repository": "https://github.com/google/sentencepiece",
+      "upstream_tag": "v0.2.2",
+      "upstream_commit": "e0cce7d37b065b5140349dbe12c6bcf6192fdd78",
+      "license": "Apache-2.0",
+      "license_source": "https://raw.githubusercontent.com/google/sentencepiece/v0.2.2/LICENSE",
+      "license_repository_copy": "THIRD_PARTY_LICENSES/SentencePiece-0.2.2-Apache-2.0.txt",
+      "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "wheel_carried_license": false,
+      "top_level_notice_at_tag": false
+    },
+    {
+      "distribution": "sherpa-onnx-core",
+      "version": "1.13.4",
+      "filename": "sherpa_onnx_core-1.13.4-py3-none-macosx_11_0_arm64.whl",
+      "url": "https://files.pythonhosted.org/packages/a2/26/d0d6bebea4ef8b7de6eed1a335235d1acce9197425c08eecb57ef107904d/sherpa_onnx_core-1.13.4-py3-none-macosx_11_0_arm64.whl",
+      "size_bytes": 16897650,
+      "sha256": "7820183581b711a68e30281a4fb36c0af8ef5615bfc789234fb259439824a014",
+      "upstream_repository": "https://github.com/k2-fsa/sherpa-onnx",
+      "upstream_tag": "v1.13.4",
+      "upstream_commit": "142807252687d81b40d6315f23470a1512a00de3",
+      "license": "Apache-2.0",
+      "license_source": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.13.4/LICENSE",
+      "license_repository_copy": "THIRD_PARTY_LICENSES/Sherpa-ONNX-1.13.4-Apache-2.0.txt",
+      "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "wheel_carried_license": false,
+      "top_level_notice_at_tag": false
+    },
+    {
+      "distribution": "tokenizers",
+      "version": "0.22.2",
+      "filename": "tokenizers-0.22.2-cp39-abi3-macosx_11_0_arm64.whl",
+      "url": "https://files.pythonhosted.org/packages/2e/47/174dca0502ef88b28f1c9e06b73ce33500eedfac7a7692108aec220464e7/tokenizers-0.22.2-cp39-abi3-macosx_11_0_arm64.whl",
+      "size_bytes": 2981472,
+      "sha256": "1e418a55456beedca4621dbab65a318981467a2b188e982a23e117f115ce5001",
+      "upstream_repository": "https://github.com/huggingface/tokenizers",
+      "upstream_tag": "v0.22.2",
+      "upstream_commit": "f383101a26663708484cac0727792aad74f78234",
+      "license": "Apache-2.0",
+      "license_source": "https://raw.githubusercontent.com/huggingface/tokenizers/v0.22.2/LICENSE",
+      "license_repository_copy": "THIRD_PARTY_LICENSES/HuggingFace-Tokenizers-0.22.2-Apache-2.0.txt",
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "wheel_carried_license": false,
+      "top_level_notice_at_tag": false
+    }
+  ]
+}

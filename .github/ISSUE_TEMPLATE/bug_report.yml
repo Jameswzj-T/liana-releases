@@ -12,14 +12,14 @@ body:
     id: version
     attributes:
       label: Liana version
-      placeholder: v0.1.0-rc.3
+      placeholder: v0.1.0-rc.4 (or the exact version you installed)
     validations:
       required: true
   - type: input
     id: macos
     attributes:
       label: macOS version and Mac chip
-      placeholder: macOS 15.x, M2
+      placeholder: macOS 26.x, M2
     validations:
       required: true
   - type: dropdown

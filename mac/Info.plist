@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.voiceflow.mac</string>
+    <key>CFBundleName</key>
+    <string>Liana</string>
+    <key>CFBundleDisplayName</key>
+    <string>Liana</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>4</string>
+    <key>LianaReleaseVersion</key>
+    <string>0.1.0-rc.4</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>26.0</string>
+    <!-- 不用 LSUIElement:它把 app 定死成"代理应用",会让运行时的 .regular 转不彻底
+         → 输入法候选框弹不出(①)+ 窗口不按普通规矩排序、总在最前(⑥)。
+         "无 Dock 图标的菜单栏应用"改由 main.swift 的 setActivationPolicy(.accessory) 达成,开窗口时再翻 .regular。 -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Liana 需要麦克风来把你的语音转写成文字。</string>
+</dict>
+</plist>

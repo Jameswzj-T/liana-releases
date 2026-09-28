@@ -4,7 +4,9 @@ Local-first dictation for your Mac. Hold a hotkey, speak, and release to insert 
 
 [Download the free early preview](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) · [Quick start](#quick-start) · [中文简介](#中文简介) · [Feedback](https://github.com/Jameswzj-T/liana-releases/issues)
 
-**Apple Silicon · macOS 14 or later · v0.1.0-rc.3 · About 1.08 GB download**
+**Apple Silicon · Current source / RC4: macOS 26+ · Published download: RC3**
+
+The product source is now included in this repository. The next preview, **RC4**, is being prepared locally and has not been uploaded; the download link above still points to the historical RC3 release (about 1.08 GB). The current locked MLX runtime requires macOS 26; the older macOS 14 statement must not be used as the compatibility requirement for current source builds.
 
 > This preview is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block the first launch. Read the installation steps before opening it. All included features are available in this free preview; optional cloud services require your own API key and may charge you separately.
 
@@ -40,7 +42,7 @@ This is a real text-model response to a prepared example, not a microphone recog
 | Automatic text cleanup | Off | The current transcript, without audio |
 | Selected-text rewriting | Off | The selected text and your instruction text, without audio |
 
-Cloud features require opt-in and your own provider key. Saving a key does not turn them on. Keys stay in macOS Keychain; provider retention policies and fees apply to requests you enable. [Privacy details](https://github.com/Jameswzj-T/liana-releases/blob/main/PRIVACY.md).
+Cloud features require opt-in and your own provider key. Saving a key does not turn them on. **Save and test / Test service** explicitly sends a fixed test sentence or generated one-second silent clip and may incur a small charge, even if dictation cloud switches remain off. Local Keychain authorization does not itself call a provider. Keys stay in macOS Keychain; provider retention policies and fees apply to requests you enable. [Privacy details](PRIVACY.md).
 
 History lets you view and copy the original transcript. It does not automatically undo text already pasted into another app.
 
@@ -81,14 +83,20 @@ Try it in an ordinary task, then [tell us what happened](https://github.com/Jame
 
 Include your Mac chip, macOS version, and Liana version when reporting a bug. Share only examples you are comfortable making public. **Do not post API keys, private dictated text, recordings, or unredacted logs.** For security issues, use [private vulnerability reporting](https://github.com/Jameswzj-T/liana-releases/security/advisories/new), not a public issue.
 
-This repository contains downloads, documentation, and feedback—not the development source code. The existing [license](https://github.com/Jameswzj-T/liana-releases/blob/main/LICENSE) and [security guidance](https://github.com/Jameswzj-T/liana-releases/blob/main/SECURITY.md) apply unchanged.
+## Build from source
+
+This repository now includes the product source, synthetic offline tests, documentation, and the existing preview release history. Private development history, recordings, logs, and account settings are not included.
+
+The supported locked build uses **Apple Silicon, macOS 26+, Python 3.12, and a Swift 6 toolchain**. The app shell's macOS 14 deployment target does not lower the requirement of the bundled MLX runtime. See [building instructions](docs/BUILDING.md), [Chinese source overview](docs/SOURCE_OVERVIEW_ZH.md), [third-party notices](THIRD_PARTY_NOTICES.md), and [release requirements](docs/RELEASING.md).
+
+The existing [MIT license](LICENSE) covers project source; third-party components retain their own licenses. [Security guidance](SECURITY.md) applies unchanged. Source compilation and automated checks are not substitutes for clean-device installation or microphone/permission acceptance.
 
 ## 中文简介
 
 Liana 是 macOS 本地优先听写工具：按住热键说话，松开后文字落在光标处。新安装的默认热键是 Command + Shift + D，可在设置中改成图片示范的右侧 Command。支持中文、英文和中英混说，默认本地转写，无需账号或 API Key；模型和运行环境随安装包提供。
 
-当前是免费的早期预览版，所有现有功能均可试用，不是已经过苹果 Developer ID 签名和公证的正式版。仅支持 Apple Silicon、macOS 14 及以上，下载约 1.08 GB。请按上方步骤校验文件，再参考[安装说明](https://github.com/Jameswzj-T/liana-releases/blob/main/INSTALL.md)打开。
+当前是免费的早期预览版，不是已经过苹果 Developer ID 签名和公证的正式版。当前源码及准备中的 RC4 锁定组合要求 Apple Silicon、macOS 26 及以上；已有 RC3 下载约 1.08 GB，保留作历史版本，RC4 尚未上传。请按对应版本校验文件，再参考[安装说明](INSTALL.md)打开。
 
 云端转写上传录音；自动整理上传文字；选中文字改写先预览、确认后替换。这些能力默认关闭，需主动启用并自备 Key，可能产生第三方费用。介绍图是流程与真实文本整理示例，不是录音识别准确率承诺。
 
-欢迎在 [Issues](https://github.com/Jameswzj-T/liana-releases/issues) 反馈安装、日常使用和实际遗漏问题。不要公开私人原文、录音、完整日志或凭据。开发源码目前仍保留在私有仓库。
+欢迎在 [Issues](https://github.com/Jameswzj-T/liana-releases/issues) 反馈安装、日常使用和实际遗漏问题。不要公开私人原文、录音、完整日志或凭据。产品源码已整理到本仓库；私人开发记录、真实口述样本和旧开发历史不公开。

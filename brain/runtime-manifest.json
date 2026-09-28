@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "purpose": "Liana first-release Python source and dependency boundary",
+  "source_lock": "brain/runtime-source-lock.json",
+  "brain_sources": [
+    "brain/daemon.py",
+    "brain/core/__init__.py",
+    "brain/core/asr.py",
+    "brain/core/config.py",
+    "brain/core/credential_check.py",
+    "brain/core/e2e.py",
+    "brain/core/gate.py",
+    "brain/core/literal_text.py",
+    "brain/core/polish.py",
+    "brain/core/postprocess.py",
+    "brain/core/screen_context.py",
+    "brain/core/speaker.py",
+    "brain/core/stream_asr.py",
+    "brain/core/text_enhancement.py",
+    "brain/core/vocab_context.py",
+    "brain/core/voice_commands.py",
+    "brain/core/spoken_repetition.py",
+    "brain/core/neutral_list_labels.py"
+  ],
+  "python_groups": {
+    "default_local": {
+      "roots": [
+        "mlx-audio",
+        "sherpa-onnx",
+        "numpy",
+        "soundfile",
+        "pypinyin",
+        "python-dotenv"
+      ]
+    },
+    "optional_cloud": {
+      "roots": [
+        "dashscope",
+        "requests",
+        "httpx"
+      ]
+    }
+  },
+  "forbidden_release_distributions": [
+    "torch",
+    "llvmlite",
+    "opencv-python",
+    "onnxruntime",
+    "sympy",
+    "numba",
+    "mlx-vlm",
+    "pytest",
+    "mlx-whisper",
+    "qwen3-asr-mlx"
+  ],
+  "notes": [
+    "The supported default route is local qwen3_06 plus Silero VAD.",
+    "Optional cloud features require separate user configuration.",
+    "This manifest identifies runtime inputs, not redistribution permission."
+  ]
+}

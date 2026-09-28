@@ -1,5 +1,7 @@
 # Install the Liana early preview
 
+> RC4 is being prepared locally and is not uploaded yet. The RC3 download below is preserved as a historical release. Current source / RC4 uses a locked MLX runtime requiring Apple Silicon and macOS 26+. A new ad-hoc build may request Keychain and Accessibility authorization again; do not disable system protection or delete stored keys to work around a prompt. The remaining RC3 instructions describe that older release, not RC4 acceptance.
+
 [中文安装说明](#安装-liana-早期预览版)
 
 ## Before downloading
