@@ -6,7 +6,7 @@ Local-first dictation for your Mac. Hold a hotkey, speak, and release to insert 
 
 **Apple Silicon · Current source / RC4: macOS 26+ · Published download: RC3**
 
-The product source is now included in this repository. The next preview, **RC4**, is being prepared locally and has not been uploaded; the download link above still points to the historical RC3 release (about 1.08 GB). The current locked MLX runtime requires macOS 26; the older macOS 14 statement must not be used as the compatibility requirement for current source builds.
+The product source is now included in this repository. The next preview, **RC4**, has been built and checked locally but has not been uploaded; see its [artifact details and remaining acceptance checks](releases/v0.1.0-rc.4.md). The download link above still points to the historical RC3 release (about 1.08 GB). The current locked MLX runtime requires macOS 26; the older macOS 14 statement must not be used as the compatibility requirement for current source builds.
 
 > This preview is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block the first launch. Read the installation steps before opening it. All included features are available in this free preview; optional cloud services require your own API key and may charge you separately.
 
