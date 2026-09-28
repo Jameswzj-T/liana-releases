@@ -9,9 +9,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let recorder = AudioRecorder()
     private let transcriber = Transcriber.shared
     private var hotkey: HotkeyManager!
-    private var editHotkey: HotkeyManager!          // 选中文字增强的独立热键(默认 ⌘⇧E)
+    private var editHotkey: HotkeyManager!          // 选中文字增强的独立热键(默认右Option)
     private var fixHotkey: HotkeyManager!           // 改上一条的独立热键(默认 ⌘⇧U)
     private var isRecording = false
+    private var recordingStartGate = RecordingStartGate()
     private var isProcessing = false
     private var processingWait: DictationWait?
     private var dictationToken = UUID()
@@ -75,10 +76,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = menu
 
 
-        hotkey = HotkeyManager(onTrigger: { [weak self] in self?.toggleRecording() })
+        hotkey = HotkeyManager(onTrigger: { [weak self] in self?.toggleRecording() },
+            canTrigger: { [weak self] in
+                guard let self else { return false }
+                return !self.isProcessing && !self.isEditing
+            })
         hotkey.apply(HotkeyConfig.current)
 
-        editHotkey = HotkeyManager(onTrigger: { [weak self] in self?.toggleEditMode() })
+        editHotkey = HotkeyManager(config: .editDefault, onTrigger: { [weak self] in self?.toggleEditMode() },
+            canTrigger: { [weak self] in
+                guard let self else { return false }
+                return !self.isProcessing && !self.isRecording && !self.recordingStartGate.isPending
+                    && (!self.isEditing || self.isEditInstructionRecording || TextEnhancementPanel.shared.canStartVoice)
+            })
         editHotkey.apply(HotkeyConfig.currentEdit)
 
         fixHotkey = HotkeyManager(onTrigger: { [weak self] in self?.showFixLast() })
@@ -177,6 +187,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func toggleRecording() {
         guard !isProcessing else { return }
         if isEditing { return }        // 改写进行中,忽略听写热键(两模式互斥)
+        if recordingStartGate.isPending {
+            recordingStartGate.cancel()
+            hotkey.invalidatePendingTap()
+            return
+        }
         if isRecording {
             stopRecording()
         } else {
@@ -185,7 +200,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func startRecording() {
-        guard !isProcessing else { return }
+        guard !isProcessing, let startToken = recordingStartGate.begin() else { return }
 
         dictationTargetBundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
 
@@ -199,7 +214,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let contextOn = (UserDefaults.standard.object(forKey: "contextAware") as? Bool) ?? true  // 默认开
         Task { @MainActor in
-            guard await AudioRecorder.requestPermission() else {
+            guard recordingStartGate.pending == startToken else { return }
+            let allowed = await AudioRecorder.requestPermission()
+            guard recordingStartGate.finish(startToken), !isProcessing, !isEditing else { return }
+            guard allowed else {
                 vlog("麦克风权限被拒")
                 return
             }
@@ -327,6 +345,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func handleEscape() {
+        recordingStartGate.cancel()
+        hotkey.invalidatePendingTap()
+        editHotkey.invalidatePendingTap()
         if isProcessing {
             dictationToken = UUID()
             if let processingWait { processingWait.cancel(interrupt: { transcriber.interrupt() }) }
@@ -357,6 +378,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     private func cancelRecording() {
+        recordingStartGate.cancel()
+        hotkey.invalidatePendingTap()
+        editHotkey.invalidatePendingTap()
         guard isRecording else { return }
         isRecording = false
         NSSound(named: "Funk")?.play()  // 取消音效:跟确认(Pop)区分,一听就知道这条被丢弃了
@@ -376,6 +400,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     private func stopRecording() {
+        recordingStartGate.cancel()
+        hotkey.invalidatePendingTap()
+        editHotkey.invalidatePendingTap()
         guard isRecording else { return }
         isRecording = false
         isProcessing = true
@@ -479,7 +506,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func toggleEditMode() {
         guard !isProcessing else { return }
-        if isRecording { return }      // 听写进行中,忽略改写热键(两模式互斥)
+        if isRecording || recordingStartGate.isPending { return }
         if isEditing {
             if isEditInstructionRecording {
                 stopEditInstructionRecording()
@@ -511,7 +538,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func captureSelectionAndShowPreview() {
-        guard !isEditing, !isRecording, !isProcessing else { return }   // 等待期间状态若变了 → 放弃
+        guard !isEditing, !isRecording, !isProcessing, !recordingStartGate.isPending else { return }
 
         let selectionTarget = Paster.captureTarget()
         guard let sel = Paster.copySelection(stillCurrent: { Paster.targetMatches(selectionTarget) }),
@@ -547,28 +574,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard isEditing, !isRecording, !isEditInstructionRecording else { return }
         guard initial || TextEnhancementPanel.shared.canStartVoice else { return }
 
-        editRequestToken = UUID()
+        let instructionToken = UUID()
+        editRequestToken = instructionToken
         isEditInstructionRecording = true
         editRecorderStarted = false
         TextEnhancementPanel.shared.beginVoice()
         statusItem.button?.contentTintColor = .systemRed
 
         Task { @MainActor in
-            guard await AudioRecorder.requestPermission() else {
-                guard isEditing, isEditInstructionRecording else { return }
+            guard isEditing, isEditInstructionRecording, editRequestToken == instructionToken else { return }
+            let allowed = await AudioRecorder.requestPermission()
+            guard isEditing, isEditInstructionRecording, editRequestToken == instructionToken else { return }
+            guard allowed else {
                 isEditInstructionRecording = false
                 statusItem.button?.contentTintColor = .systemBlue
                 TextEnhancementPanel.shared.fail("microphone_permission")
                 return
             }
-            guard isEditing, isEditInstructionRecording else { return }
 
             recorder.onChunk16k = nil
             recorder.onSpectrum = { [weak self] rms, bands in
                 DispatchQueue.main.async {
                     MainActor.assumeIsolated {
                         guard self?.isEditing == true,
-                              self?.isEditInstructionRecording == true else { return }
+                              self?.isEditInstructionRecording == true,
+                              self?.editRequestToken == instructionToken else { return }
                         TextEnhancementPanel.shared.push(rms, bands)
                     }
                 }
@@ -577,7 +607,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 DispatchQueue.main.async {
                     MainActor.assumeIsolated {
                         guard self?.isEditing == true,
-                              self?.isEditInstructionRecording == true else { return }
+                              self?.isEditInstructionRecording == true,
+                              self?.editRequestToken == instructionToken else { return }
                         TextEnhancementPanel.shared.markRecording()
                         NSSound(named: "Tink")?.play()
                     }
@@ -601,7 +632,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func stopEditInstructionRecording() {
+        editHotkey.invalidatePendingTap()
         guard isEditing, isEditInstructionRecording else { return }
+        editRequestToken = UUID()
         isEditInstructionRecording = false
         recorder.onSpectrum = nil
         recorder.onFirstBuffer = nil
@@ -668,6 +701,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func discardEditInstructionRecording() {
+        editHotkey.invalidatePendingTap()
+        editRequestToken = UUID()
         let wasActive = isEditInstructionRecording || editRecorderStarted
         isEditInstructionRecording = false
         recorder.onSpectrum = nil
@@ -682,6 +717,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     private func cancelEditMode() {
+        editHotkey.invalidatePendingTap()
         guard isEditing else { return }
         NSSound(named: "Funk")?.play()
         TextEnhancementPanel.shared.cancel()
@@ -690,6 +726,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func finishEditMode() {
+        hotkey.invalidatePendingTap()
+        editHotkey.invalidatePendingTap()
         guard isEditing else { return }
         discardEditInstructionRecording()
         editRequestToken = UUID()

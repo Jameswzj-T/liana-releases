@@ -101,11 +101,11 @@ struct HomeView: View {
                 Spacer(minLength: 0)
             }
             HStack(spacing: 8) {
-                Text(L("按住", "Hold")).foregroundStyle(Theme.Palette.textSecondary)
+                Text(L("点按", "Tap")).foregroundStyle(Theme.Palette.textSecondary)
                 Text(hotkey).font(.system(size: 12, weight: .semibold, design: .monospaced)).foregroundStyle(Theme.Palette.textPrimary)
                     .padding(.horizontal, 7).padding(.vertical, 2)
                     .background(RoundedRectangle(cornerRadius: 6).fill(Theme.Palette.bgElevated))
-                Text(L("说话,松手即出字", "to talk, release to drop text")).foregroundStyle(Theme.Palette.textSecondary)
+                Text(L("开始说话，再点一下结束", "to start, tap again to finish")).foregroundStyle(Theme.Palette.textSecondary)
             }
             .font(.system(size: 13))
         }

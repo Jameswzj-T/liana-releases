@@ -343,7 +343,7 @@ struct SettingsView: View {
     private var shortcutsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             section(L("快捷键", "Shortcuts"))
-            row(L("听写热键", "Dictation Hotkey"), L("按住说话，松开落字", "Hold to talk, release to insert text")) {
+            row(L("听写热键", "Dictation Hotkey"), L("点一下开始，再点一下结束", "Tap once to start, again to finish")) {
                 HotkeyRecorderView(onChange: onHotkeyChange)
             }
             row(L("文字增强热键", "Text Enhancement Hotkey"),

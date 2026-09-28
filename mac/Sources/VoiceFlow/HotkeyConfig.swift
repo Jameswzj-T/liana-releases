@@ -12,18 +12,18 @@ struct HotkeyConfig: Codable, Equatable {
     var modifiers: NSEvent.ModifierFlags { NSEvent.ModifierFlags(rawValue: modifierRaw) }
 
     static let `default` = HotkeyConfig(
-        keyCode: 2,  // 'D'
-        modifierRaw: NSEvent.ModifierFlags([.command, .shift]).rawValue,
-        isModifierOnly: false,
-        display: "⌘⇧D"
+        keyCode: 54,
+        modifierRaw: NSEvent.ModifierFlags.command.rawValue,
+        isModifierOnly: true,
+        display: "右⌘"
     )
 
 
     static let editDefault = HotkeyConfig(
-        keyCode: 14,  // 'E'
-        modifierRaw: NSEvent.ModifierFlags([.command, .shift]).rawValue,
-        isModifierOnly: false,
-        display: "⌘⇧E"
+        keyCode: 61,
+        modifierRaw: NSEvent.ModifierFlags.option.rawValue,
+        isModifierOnly: true,
+        display: "右⌥"
     )
 
 
@@ -53,8 +53,15 @@ struct HotkeyConfig: Codable, Equatable {
         return display
     }
 
-    static func load(key: String, fallback: HotkeyConfig) -> HotkeyConfig {
-        if let data = UserDefaults.standard.data(forKey: key),
+    var standaloneTapKey: ModifierTap.Key? {
+        guard isModifierOnly else { return nil }
+        if keyCode == 54 && modifiers == .command { return .rightCommand }
+        if keyCode == 61 && modifiers == .option { return .rightOption }
+        return nil
+    }
+
+    static func load(key: String, fallback: HotkeyConfig, defaults: UserDefaults = .standard) -> HotkeyConfig {
+        if let data = defaults.data(forKey: key),
            let cfg = try? JSONDecoder().decode(HotkeyConfig.self, from: data) {
             return cfg
         }
