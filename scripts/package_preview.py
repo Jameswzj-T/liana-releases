@@ -26,7 +26,7 @@ if sys.flags.optimize:
     raise RuntimeError('Run release checks without Python optimization (-O).')
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '0.1.0-rc.6'
+VERSION = '0.1.0-rc.7'
 SPEAKER_MODEL = 'models/speaker/campplus.onnx'
 
 

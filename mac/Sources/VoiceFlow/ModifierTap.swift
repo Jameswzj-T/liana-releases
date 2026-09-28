@@ -21,14 +21,40 @@ struct ModifierTap {
     private var eligible = false
     private var keysDown: Set<UInt16> = []
     var observedKeysDown: Set<UInt16> { keysDown }
+    var observedModifierDown: Bool { isDown }
     private var buttonsDown: Set<NSEvent.EventType> = []
+    // A valid tap must wait for its event-stream release. A physical snapshot
+    // can run before that queued release and is not proof the event was lost.
+    var needsReleaseCheck: Bool { (isDown && !eligible) || !keysDown.isEmpty || !buttonsDown.isEmpty }
 
     init(key: Key) { self.key = key }
     mutating func invalidate() { eligible = false }
+    mutating func observeDiscardedKey(_ code: UInt16, physicallyDown: Bool) {
+        // A queued event may still describe a held chord key. Keep that fact,
+        // but never let an event from before recovery create a tap candidate.
+        if physicallyDown { keysDown.insert(code) } else { keysDown.remove(code) }
+        invalidate()
+    }
     mutating func focusChanged(modifierIsDown: Bool) {
         // Never finish a tap that began in another focus/permission session.
         isDown = modifierIsDown
         eligible = false
+    }
+
+    /// Only remove observations proven released; never infer a new press or fire.
+    /// The caller must fence queued events before applying this newer snapshot.
+    @discardableResult
+    mutating func reconcileReleasedInputs(keysStillDown: Set<UInt16>, modifierIsDown: Bool,
+                                          mouseButtons: Int) -> Bool {
+        let retainedKeys = keysDown.intersection(keysStillDown)
+        let lostModifierRelease = isDown && !eligible && !modifierIsDown
+        let lostMouseRelease = !buttonsDown.isEmpty && mouseButtons == 0
+        let changed = retainedKeys != keysDown || lostModifierRelease || lostMouseRelease
+        keysDown = retainedKeys
+        if lostModifierRelease { isDown = false }
+        if lostMouseRelease { buttonsDown.removeAll() }
+        if changed { invalidate() }
+        return changed
     }
 
     mutating func consume(type: NSEvent.EventType, keyCode: UInt16, flags: NSEvent.ModifierFlags,

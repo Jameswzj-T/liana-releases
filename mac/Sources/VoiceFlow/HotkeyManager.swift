@@ -24,6 +24,25 @@ private final class SystemHotkeyEventMonitoring: HotkeyEventMonitoring {
     func remove(_ token: Any) { NSEvent.removeMonitor(token) }
 }
 
+/// One pending check for observed chord/cancelled inputs, never for a valid tap.
+@MainActor
+protocol HotkeyReleaseChecking {
+    func schedule(after delay: TimeInterval, _ check: @escaping @MainActor () -> Void) -> Any
+    func cancel(_ token: Any)
+}
+
+@MainActor
+private final class SystemHotkeyReleaseChecking: HotkeyReleaseChecking {
+    func schedule(after delay: TimeInterval, _ check: @escaping @MainActor () -> Void) -> Any {
+        let timer = Timer(timeInterval: delay, repeats: false) { _ in
+            MainActor.assumeIsolated { check() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        return timer
+    }
+    func cancel(_ token: Any) { (token as? Timer)?.invalidate() }
+}
+
 @MainActor
 final class HotkeyManager {
     private let onTrigger: @MainActor () -> Void
@@ -32,6 +51,9 @@ final class HotkeyManager {
     private let isKeyDown: @MainActor (UInt16) -> Bool
     private let isAccessibilityTrusted: @MainActor () -> Bool
     private let monitors: any HotkeyEventMonitoring
+    private let releaseChecks: any HotkeyReleaseChecking
+    private var releaseCheck: Any?
+    private var releaseCheckGeneration: UInt = 0
     private let clock: @MainActor () -> TimeInterval
     private var discardTapEventsThrough = -Double.infinity
     private var config: HotkeyConfig
@@ -51,6 +73,7 @@ final class HotkeyManager {
          },
          isAccessibilityTrusted: @escaping @MainActor () -> Bool = { AXIsProcessTrusted() },
          monitors: (any HotkeyEventMonitoring)? = nil,
+         releaseChecks: (any HotkeyReleaseChecking)? = nil,
          clock: @escaping @MainActor () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }) {
         self.config = config
         self.onTrigger = onTrigger
@@ -59,6 +82,7 @@ final class HotkeyManager {
         self.isKeyDown = isKeyDown
         self.isAccessibilityTrusted = isAccessibilityTrusted
         self.monitors = monitors ?? SystemHotkeyEventMonitoring()
+        self.releaseChecks = releaseChecks ?? SystemHotkeyReleaseChecking()
         self.clock = clock
         self.tap = config.standaloneTapKey.map { ModifierTap(key: $0) }
     }
@@ -87,6 +111,7 @@ final class HotkeyManager {
 
     func stop() {
         isMonitoring = false
+        cancelReleaseCheck()
         discardTapEventsThrough = -Double.infinity
         tap = config.standaloneTapKey.map { ModifierTap(key: $0) }
         for observer in workspaceObservers { NSWorkspace.shared.notificationCenter.removeObserver(observer) }
@@ -115,19 +140,70 @@ final class HotkeyManager {
     }
 
     // Permission changes, app switching, wake and unlock must not require a restart.
-    // No permission prompts, timer polling, or changes to saved shortcuts here.
+    // No permission prompts or changes to saved shortcuts here.
     func environmentDidChange() {
         guard isMonitoring else { return }
-        discardTapEventsThrough = clock()
+        discardTapEventsThrough = max(discardTapEventsThrough, clock())
+        reconcileReleasedInputs()
         if let key = config.standaloneTapKey { tap?.focusChanged(modifierIsDown: isKeyDown(key.code)) }
         if lastAccessibilityTrusted != isAccessibilityTrusted() || globalMon == nil || localMon == nil {
             installMonitors()
+        }
+        updateReleaseCheck()
+    }
+
+    private func cancelReleaseCheck() {
+        releaseCheckGeneration &+= 1
+        if let token = releaseCheck { releaseChecks.cancel(token) }
+        releaseCheck = nil
+    }
+
+    private func updateReleaseCheck() {
+        guard isMonitoring, tap?.needsReleaseCheck == true else {
+            cancelReleaseCheck()
+            return
+        }
+        guard releaseCheck == nil else { return }
+        releaseCheckGeneration &+= 1
+        let generation = releaseCheckGeneration
+        releaseCheck = releaseChecks.schedule(after: 0.25) { [weak self] in
+            guard let self, self.isMonitoring, self.releaseCheckGeneration == generation else { return }
+            self.releaseCheck = nil
+            self.reconcileReleasedInputs()
+            self.updateReleaseCheck()
+        }
+    }
+
+    private func reconcileReleasedInputs() {
+        guard let snapshot = tap, snapshot.needsReleaseCheck else { return }
+        // Sample only inputs this recognizer saw pressed. Unobserved key-state
+        // bits can themselves be stale; a whole-keyboard scan would disable taps.
+        let sampledAt = clock()
+        let keys = Set(snapshot.observedKeysDown.filter(isKeyDown))
+        let modifierDown = snapshot.observedModifierDown && isKeyDown(snapshot.key.code)
+        if tap?.reconcileReleasedInputs(keysStillDown: keys, modifierIsDown: modifierDown,
+                                       mouseButtons: pressedMouseButtons()) == true {
+            discardTapEventsThrough = max(discardTapEventsThrough, sampledAt)
         }
     }
 
     // Tests feed events here without installing monitors or recording audio.
     func handle(_ e: NSEvent) {
         if tap != nil {
+            defer { updateReleaseCheck() }
+            guard e.timestamp > discardTapEventsThrough else {
+                // Reject old gestures, not evidence of a currently held chord.
+                // Otherwise a queued letter-down could be lost while the letter
+                // is still held, making the next modifier look like a clean tap.
+                if e.type == .keyDown || e.type == .keyUp {
+                    tap?.observeDiscardedKey(e.keyCode, physicallyDown: isKeyDown(e.keyCode))
+                } else if e.type == .flagsChanged, e.keyCode == tap?.key.code {
+                    tap?.focusChanged(modifierIsDown: isKeyDown(e.keyCode))
+                } else {
+                    tap?.invalidate()
+                }
+                return
+            }
             let keyboard = e.type == .flagsChanged || e.type == .keyDown || e.type == .keyUp
             let checkKeys = e.type == .flagsChanged && e.keyCode == tap!.key.code
                 && e.modifierFlags.contains(tap!.key.flag)
@@ -136,7 +212,7 @@ final class HotkeyManager {
             if let physical, physical != observed {
                 // Physical state is newer than queued NSEvents. Once reconciling,
                 // cancel ALL taps created before this point, not just the first.
-                discardTapEventsThrough = clock()
+                discardTapEventsThrough = max(discardTapEventsThrough, clock())
             }
             let trigger = tap!.consume(type: e.type, keyCode: keyboard ? e.keyCode : 0, flags: e.modifierFlags,
                                        physicalMouseButtons: pressedMouseButtons(),
