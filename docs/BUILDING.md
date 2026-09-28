@@ -23,9 +23,9 @@ python3.12 scripts/setup_models.py --download
 python3.12 brain/tools/verify_models.py --group first_release
 ```
 
-工具只下载清单中的 Qwen3-ASR 0.6B 固定版本和 Silero VAD，并逐个校验 SHA-256。已有同名但校验不同的文件不会被覆盖。模型体积约 1 GB，请预留下载及临时文件空间。
+工具只下载清单中的 Qwen3-ASR 0.6B 固定版本、Silero VAD 和可选声纹功能所需的 CAM++ 模型，并逐个校验 SHA-256。已有同名但校验不同的文件不会被覆盖。模型体积约 1 GB，请预留下载及临时文件空间。
 
-Qwen 放在 `~/Library/Application Support/VoiceFlow/models/Qwen3-ASR-0.6B-8bit/`，Silero 放在 `brain/models/`。如果已使用 Liana，这个模型目录可能已存在；校验一致的文件会复用，不读取历史或 Key。
+Qwen 放在 `~/Library/Application Support/VoiceFlow/models/Qwen3-ASR-0.6B-8bit/`，Silero 放在 `brain/models/`，CAM++ 放在 `brain/models/speaker/campplus.onnx`。如果已使用 Liana，这些模型文件可能已存在；校验一致的文件会复用，不读取历史、声纹登记或 Key。下载模型不会自动开启声纹筛选。
 
 实际运行优先使用 `ASR_QWEN3_06_MODEL` 指定的目录，其次为仓库内 `brain/models/Qwen3-ASR-0.6B-8bit/`，最后才是上述应用支持目录。不要让旧的环境变量或模型副本覆盖刚校验的版本；下面的运行命令明确使用该目录。
 
