@@ -1,31 +1,31 @@
 # Install the Liana early preview
 
-> RC4 is being prepared locally and is not uploaded yet. The RC3 download below is preserved as a historical release. Current source / RC4 uses a locked MLX runtime requiring Apple Silicon and macOS 26+. A new ad-hoc build may request Keychain and Accessibility authorization again; do not disable system protection or delete stored keys to work around a prompt. The remaining RC3 instructions describe that older release, not RC4 acceptance.
+> This guide is for **RC4**. [RC3](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) remains available as a previous release. RC4 requires Apple Silicon and macOS 26+. It is an unnotarized open-source preview; follow the per-app steps below rather than disabling system protection.
 
 [中文安装说明](#安装-liana-早期预览版)
 
 ## Before downloading
 
 - **Apple Silicon Mac** (M-series chip); Intel Macs are not supported.
-- **macOS 14 or later.**
+- **macOS 26 or later.**
 - Microphone permission for recording, and Accessibility permission for the global hotkey and inserting text.
-- The RC3 ZIP is about **1.08 GB**. The speech model and runtime are included; you do not need to install Python or download a separate model.
+- The RC4 ZIP is about **1.07 GB**. The speech model and runtime are included; you do not need to install Python or download a separate model.
 
-This is a free early preview, not a finished release. It is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block its first launch. If you are not comfortable with that, wait for a notarized release; you do not need to override your Mac's protections to help with feedback.
+This is a free open-source early preview. It is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block its first launch. If you are not comfortable approving this app, do not install the prebuilt download. Source and [build instructions](docs/BUILDING.md) are available separately; a future notarized release is not promised.
 
 ## Download and verify
 
-1. On the [RC3 release page](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3), download `Liana-0.1.0-rc.3-macos-arm64.zip` and `SHA256SUMS.txt` from **Assets**.
+1. On the [RC4 release page](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.4), download `Liana-0.1.0-rc.4-macos-arm64.zip` and `SHA256SUMS.txt` from **Assets**.
 2. If the ZIP is in your Downloads folder, run this in Terminal:
 
    ```bash
-   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.3-macos-arm64.zip
+   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.4-macos-arm64.zip
    ```
 
 3. The hash at the start of the output must be:
 
    ```text
-   601a40b010388396938d9c45deb79c3a4e18730597144c66d391454ea46c4a39
+   d276b9ffcdecad4cd866818a95aff67f05b542234c31a6d744b05df088c3b5df
    ```
 
 If it differs, do not open the app. Download it again from this repository. A matching hash confirms that your file matches this release; **it is not an Apple safety certification**.
@@ -60,11 +60,13 @@ Local dictation is the default. Cloud transcription, automatic text cleanup, and
 - Automatic text cleanup sends the transcript, without audio, to a text service.
 - Selected-text rewriting sends selected text and your instruction text, without audio, and previews the result before replacement.
 
-Each cloud feature needs opt-in and your own provider key. Saving a key does not enable a feature. Keys stay in macOS Keychain; providers may charge for the requests you enable. See [Privacy](https://github.com/Jameswzj-T/liana-releases/blob/main/PRIVACY.md).
+Each cloud feature needs opt-in and your own provider key. Saving a key does not enable a feature. **Save and test / Test service** explicitly sends a fixed test sentence or generated one-second silent clip and may incur a small charge, even when cloud dictation switches are off. Keys stay in macOS Keychain. See [Privacy](https://github.com/Jameswzj-T/liana-releases/blob/main/PRIVACY.md).
 
 ## Updates and removal
 
 There is no automatic updater in this preview. Check this repository's releases for later versions.
+
+To update, quit Liana, keep a copy of the previous ZIP if you want to roll back, then replace `Liana.app` in Applications with the new copy. Avoid keeping multiple extracted copies in different folders. Your existing settings, history, and cloud switches are retained; a new ad-hoc build may request Accessibility or Keychain authorization again. Do not delete stored keys to work around an authorization prompt.
 
 To remove the app, quit Liana and move `Liana.app` from Applications to the Trash. Removing the app does not automatically remove its local settings/history, macOS permission entries, or Keychain credentials. This preview has no one-click data-cleanup tool.
 
@@ -75,24 +77,24 @@ To remove the app, quit Liana and move `Liana.app` from Applications to the Tras
 ## 运行要求
 
 - Apple Silicon Mac（M 系列芯片）
-- macOS 14 或更新版本
+- macOS 26 或更新版本
 - 麦克风权限
 - 辅助功能权限（用于全局热键及把文字写入当前光标处）
 
 ## 下载与校验
 
-1. 从 [RC3 发布页](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3)
-   下载 `Liana-0.1.0-rc.3-macos-arm64.zip`。
+1. 从 [RC4 发布页](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.4)
+   下载 `Liana-0.1.0-rc.4-macos-arm64.zip` 和 `SHA256SUMS.txt`。
 2. 建议在终端运行：
 
    ```bash
-   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.3-macos-arm64.zip
+   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.4-macos-arm64.zip
    ```
 
 3. 结果必须是：
 
    ```text
-   601a40b010388396938d9c45deb79c3a4e18730597144c66d391454ea46c4a39
+   d276b9ffcdecad4cd866818a95aff67f05b542234c31a6d744b05df088c3b5df
    ```
 
 如果结果不同，请不要打开应用，并从本仓库重新下载。
@@ -121,7 +123,11 @@ To remove the app, quit Liana and move `Liana.app` from Applications to the Tras
 - 允许辅助功能权限，以便监听全局热键并把结果写入当前应用；
 - 如果系统要求重启 Liana，请退出后重新打开。
 
-默认本地听写无需 API Key。云端能力只有在你主动打开相应开关并保存自己的 Key 后才会发送数据。
+默认本地听写无需 API Key。云端听写能力只有在你主动打开相应开关并保存自己的 Key 后才会发送数据。设置中的“保存并测试／测试服务”会主动发送固定测试句或生成的一秒静音片段，可能产生少量费用，即使听写开关仍关闭；本地钥匙串授权本身不调用云服务。
+
+## 更新
+
+退出 Liana 后，用新版本替换“应用程序”中的 `Liana.app`。想要回退时，保留上一版 ZIP 即可，避免在多个目录保留解压后的同名应用。现有设置、历史及云端开关会保留；新临时签名版本可能再次请求辅助功能或钥匙串授权，不要为消除提示而删除已有 Key。
 
 ## 卸载
 
@@ -132,6 +138,6 @@ To remove the app, quit Liana and move `Liana.app` from Applications to the Tras
 
 新安装的默认热键为 **Command + Shift + D（⌘⇧D）**；若已自定义，以设置页为准。先在备忘录或文本编辑的空白输入框按住热键说一句话，松开后查看落字。无需为了试用购买或填写任何 Key。
 
-下载约1.08GB，模型与运行环境已包含，无需另装 Python。此版没有 Developer ID 签名和苹果公证；如果你不愿覆盖系统拦截，可以等待公证版。哈希一致只说明文件与发布附件一致，不代表苹果安全认证。遇到恶意软件警告、哈希不同或没有预期的打开选项时，请先停止并反馈，不尝试额外绕过命令。
+RC4 下载约1.07GB，模型与运行环境已包含，无需另装 Python。此版没有 Developer ID 签名和苹果公证；如果你不愿为该应用单独确认打开，请不要安装预编译包，也可查看[源码构建说明](docs/BUILDING.md)。本项目不承诺未来提供公证版。哈希一致只说明文件与发布附件一致，不代表苹果安全认证。遇到恶意软件警告、哈希不同或没有预期的打开选项时，请先停止并反馈，不尝试额外绕过命令。
 
 暂不提供自动更新。本地历史也不会随移除 App 自动清除。反馈请使用本仓库 Issues 并先脱敏；不要公开 Key、私人正文、录音或完整日志。

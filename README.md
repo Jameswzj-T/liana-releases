@@ -2,11 +2,11 @@
 
 Local-first dictation for your Mac. Hold a hotkey, speak, and release to insert text where you're already writing.
 
-[Download the free early preview](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) · [Quick start](#quick-start) · [中文简介](#中文简介) · [Feedback](https://github.com/Jameswzj-T/liana-releases/issues)
+[Download RC4 — free early preview](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.4) · [Quick start](#quick-start) · [中文简介](#中文简介) · [Feedback](https://github.com/Jameswzj-T/liana-releases/issues)
 
-**Apple Silicon · Current source / RC4: macOS 26+ · Published download: RC3**
+**Apple Silicon · macOS 26+ · Open source · Free early preview**
 
-The product source is now included in this repository. The next preview, **RC4**, has been built and checked locally but has not been uploaded; see its [artifact details and remaining acceptance checks](releases/v0.1.0-rc.4.md). The download link above still points to the historical RC3 release (about 1.08 GB). The current locked MLX runtime requires macOS 26; the older macOS 14 statement must not be used as the compatibility requirement for current source builds.
+**RC4** includes the app, local speech model, and runtime in one download (about 1.07 GB). The product source is included in this repository under the MIT license. See [what's included and known limitations](releases/v0.1.0-rc.4.md); [RC3](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) remains available as a previous release.
 
 > This preview is ad-hoc signed, but has **no Apple Developer ID signature and is not Apple-notarized**. macOS may block the first launch. Read the installation steps before opening it. All included features are available in this free preview; optional cloud services require your own API key and may charge you separately.
 
@@ -48,16 +48,16 @@ History lets you view and copy the original transcript. It does not automaticall
 
 ## Quick start
 
-1. Download `Liana-0.1.0-rc.3-macos-arm64.zip` and `SHA256SUMS.txt` from the [RC3 release](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3). Verify the ZIP before opening it:
+1. Download `Liana-0.1.0-rc.4-macos-arm64.zip` and `SHA256SUMS.txt` from the [RC4 release](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.4). Verify the ZIP before opening it:
 
    ```bash
-   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.3-macos-arm64.zip
+   shasum -a 256 ~/Downloads/Liana-0.1.0-rc.4-macos-arm64.zip
    ```
 
    Expected SHA-256:
 
    ```text
-   601a40b010388396938d9c45deb79c3a4e18730597144c66d391454ea46c4a39
+   d276b9ffcdecad4cd866818a95aff67f05b542234c31a6d744b05df088c3b5df
    ```
 
    If it differs, do not open the app. Download it again from this repository. A matching hash checks that the file matches this release; it is not an Apple safety certification.
@@ -95,7 +95,7 @@ The existing [MIT license](LICENSE) covers project source; third-party component
 
 Liana 是 macOS 本地优先听写工具：按住热键说话，松开后文字落在光标处。新安装的默认热键是 Command + Shift + D，可在设置中改成图片示范的右侧 Command。支持中文、英文和中英混说，默认本地转写，无需账号或 API Key；模型和运行环境随安装包提供。
 
-当前是免费的早期预览版，不是已经过苹果 Developer ID 签名和公证的正式版。当前源码及准备中的 RC4 锁定组合要求 Apple Silicon、macOS 26 及以上；已有 RC3 下载约 1.08 GB，保留作历史版本，RC4 尚未上传。请按对应版本校验文件，再参考[安装说明](INSTALL.md)打开。
+当前 **RC4** 是免费开源的早期预览版，要求 Apple Silicon、macOS 26 及以上，下载约 1.07 GB。产品源码采用 MIT 许可证；[RC3](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3) 保留作历史版本。安装包没有苹果 Developer ID 签名和公证，首次打开可能被系统拦截；请先校验文件，再按[安装说明](INSTALL.md)操作，不要全局关闭系统安全保护。
 
 云端转写上传录音；自动整理上传文字；选中文字改写先预览、确认后替换。这些能力默认关闭，需主动启用并自备 Key，可能产生第三方费用。介绍图是流程与真实文本整理示例，不是录音识别准确率承诺。
 
