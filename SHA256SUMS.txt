@@ -2,3 +2,4 @@
 d276b9ffcdecad4cd866818a95aff67f05b542234c31a6d744b05df088c3b5df  Liana-0.1.0-rc.4-macos-arm64.zip
 83eb30a9ea5fce180eb464849600aaf5c08deb427eaf932b0a94a8a9aed8eefe  Liana-0.1.0-rc.5-macos-arm64.zip
 f53910272ffd9a3589cdd7d8c07deebc9fd0886ee583a223e2a3adcff2577a82  Liana-0.1.0-rc.6-macos-arm64.zip
+2f9d32b9c7f1186ce1d7b41b6928234a89227538008ee6696604ea82bca0ba68  Liana-0.1.0-macos-arm64.zip
