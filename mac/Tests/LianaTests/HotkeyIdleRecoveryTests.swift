@@ -109,6 +109,73 @@ final class HotkeyIdleRecoveryTests: XCTestCase {
     private let configs: [HotkeyConfig] = [.default, .editDefault]
 
     @MainActor
+    func testExternalCancellationRecoversLostReleaseBeforeFirstFreshTap() throws {
+        for config in configs {
+            for idle: TimeInterval in [0.25, 60, 3_600] {
+                let h = Harness(config)
+                defer { h.manager.stop() }
+                try h.modifier(down: true)
+                XCTAssertTrue(h.checks.pending.isEmpty, "An eligible press must await event-stream release")
+                h.manager.invalidatePendingTap() // External cancellation, without a manager key event.
+                try h.modifier(down: false, deliver: false)
+                h.state.now += idle
+                if !h.checks.pending.isEmpty { try h.checks.fire() }
+                XCTAssertEqual(h.state.triggers, 0, "Recovery must never trigger an action")
+                try h.tap()
+                XCTAssertEqual(h.state.triggers, 1, "First fresh tap after cancelled release was lost")
+            }
+        }
+    }
+
+    @MainActor
+    func testExternalCancellationKeepsActuallyHeldModifierBlocked() throws {
+        for config in configs {
+            let h = Harness(config)
+            defer { h.manager.stop() }
+            try h.modifier(down: true)
+            h.manager.invalidatePendingTap()
+            XCTAssertEqual(h.checks.pending.count, 1)
+            if !h.checks.pending.isEmpty { try h.recover(after: 60) }
+            XCTAssertEqual(h.state.triggers, 0)
+            try h.modifier(down: false)
+            XCTAssertEqual(h.state.triggers, 0, "Cancelled held press must not finish")
+            try h.tap()
+            XCTAssertEqual(h.state.triggers, 1)
+        }
+    }
+
+    @MainActor
+    func testLateCancelledRecoveryCallbackCannotStealNewValidPress() throws {
+        for config in configs {
+            let h = Harness(config)
+            defer { h.manager.stop() }
+            try h.modifier(down: true)
+            h.manager.invalidatePendingTap()
+            try h.modifier(down: false)
+            let cancelled = try XCTUnwrap(h.checks.cancelled.last)
+            try h.modifier(down: true)
+            cancelled()
+            try h.modifier(down: false)
+            XCTAssertEqual(h.state.triggers, 1)
+        }
+    }
+
+    @MainActor
+    func testExternalCancellationIsIdempotentAndCannotRestartStoppedManager() throws {
+        for config in configs {
+            let h = Harness(config)
+            for _ in 0..<3 { h.manager.invalidatePendingTap() }
+            XCTAssertTrue(h.checks.pending.isEmpty)
+            try h.modifier(down: true)
+            for _ in 0..<3 { h.manager.invalidatePendingTap() }
+            XCTAssertEqual(h.checks.pending.count, 1)
+            h.manager.stop()
+            h.manager.invalidatePendingTap()
+            XCTAssertTrue(h.checks.pending.isEmpty)
+        }
+    }
+
+    @MainActor
     func testIdleRecoveryMakesTheFirstTapWorkAfterMissingOrdinaryRelease() throws {
         for config in configs {
             for code: UInt16 in [0, 8, 48, 53, 123] {
@@ -367,6 +434,30 @@ final class HotkeyIdleRecoveryTests: XCTestCase {
         h.manager.environmentDidChange()
         XCTAssertTrue(h.checks.pending.isEmpty)
         XCTAssertTrue(h.state.samples.isEmpty)
+    }
+
+    @MainActor
+    func testRealRunLoopTimerRepairsExternalCancellationWithoutAnySystemMonitor() async throws {
+        for config in configs {
+            let h = Harness(config, systemReleaseCheck: true)
+            defer { h.manager.stop() }
+            try h.modifier(down: true)
+            h.manager.invalidatePendingTap()
+            try h.modifier(down: false, deliver: false)
+            let checked = expectation(description: "Real timer samples the cancelled released modifier")
+            h.state.onSample = { code in
+                if code == config.standaloneTapKey?.code {
+                    h.state.onSample = nil
+                    checked.fulfill()
+                }
+            }
+            await fulfillment(of: [checked], timeout: 2)
+            h.state.onSample = nil
+            XCTAssertEqual(h.state.triggers, 0, "A timer must only clear stale cancellation state")
+            try h.tap()
+            XCTAssertEqual(h.state.triggers, 1)
+            XCTAssertEqual(h.monitors.adds, 2)
+        }
     }
 
     @MainActor

@@ -1,9 +1,9 @@
 # Download Liana / 下载 Liana
 
-**Latest published preview / 当前公开预览版：[RC6](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.6)**
+**Current release / 当前版本：[Liana 0.1.0](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0)**
 
-The install ZIP and checksum are under **Assets** on that release page. This repository folder contains release notes, not installation packages. A file's “RC4” commit message only records its last change; it does not identify the latest release.
+Download the ZIP and `SHA256SUMS.txt` under **Assets**. This folder contains release notes, not installation packages. Read [Installation](../INSTALL.md) and the [0.1.0 notes](v0.1.0.md) before opening the unnotarized app.
 
-安装 ZIP 和校验文件在上方发布页的 **Assets** 中。本目录保存的是发布说明，不是安装包；文件旁边的“RC4”提交说明表示那份文件上次何时修改，不代表最新版本只有 RC4。
+安装包和校验文件在发布页的 Assets 中。本目录为发布说明。要求 Apple Silicon / macOS 26+；安装包未公证，请先看安装说明。
 
-Previous previews / 历史预览：[RC5](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.5) · [RC4](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.4) · [RC3](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3)
+Previous previews / 历史版本：[RC6](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.6) · [RC5](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.5) · [RC4](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.4) · [RC3](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.3)

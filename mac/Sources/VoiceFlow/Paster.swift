@@ -132,6 +132,19 @@ enum Paster {
         let ownedChangeCount: Int
     }
 
+    // Selected-text previews publish a copy only. The user chooses where to paste.
+    static func copyCandidate(
+        _ text: String,
+        on pasteboard: NSPasteboard = .general,
+        writeText: (NSPasteboard, String) -> Bool = { $0.setString($1, forType: .string) }
+    ) -> Bool {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
+        let owned = pasteboard.clearContents()
+        guard pasteboard.changeCount == owned, writeText(pasteboard, text),
+              pasteboard.changeCount == owned else { return false }
+        return true
+    }
+
     nonisolated static func commandEvents(_ key: CGKeyCode) -> (CGEvent, CGEvent)? {
         let src = CGEventSource(stateID: .combinedSessionState)
         guard let down = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: true),

@@ -119,9 +119,6 @@ final class TextEnhancementPanel: NSObject, NSWindowDelegate {
 
     private var panel: NSPanel?
     private var priorApp: NSRunningApplication?
-    private var deliveryTarget: Paster.DeliveryTarget?
-    private var acceptanceToken = UUID()
-    private var acceptancePending = false
     private var onDismiss: (() -> Void)?
     private var onVoiceAction: (() -> Void)?
     private var onQuickAction: ((EnhancementOperation) -> Void)?
@@ -137,8 +134,6 @@ final class TextEnhancementPanel: NSObject, NSWindowDelegate {
         onDismiss: @escaping () -> Void
     ) {
         priorApp = NSWorkspace.shared.frontmostApplication
-        deliveryTarget = Paster.captureTarget()
-        acceptancePending = false
         self.onVoiceAction = onVoiceAction
         self.onQuickAction = onQuickAction
         self.onDismiss = onDismiss
@@ -210,51 +205,19 @@ final class TextEnhancementPanel: NSObject, NSWindowDelegate {
 
     private func accept(_ candidate: String) {
         guard !candidate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              onDismiss != nil, !acceptancePending else { return }
-        acceptancePending = true
-        let prior = priorApp
+              onDismiss != nil, model.canAccept else { return }
         meter.active = false
+        guard Paster.copyCandidate(candidate) else {
+            Toast.show(L("复制失败，候选仍保留；原应用文字未改动。", "Copy failed. Your candidate is still here; the original app was not changed."), duration: 5)
+            return
+        }
         panel?.orderOut(nil)
-
-        let target = deliveryTarget
-        let token = UUID()
-        acceptanceToken = token
-
-        if let prior, prior.bundleIdentifier != Bundle.main.bundleIdentifier {
-            prior.activate(options: [])
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-            guard self.onDismiss != nil, self.acceptanceToken == token else { return }
-            guard Paster.targetMatches(target) else {
-                self.acceptancePending = false
-                self.panel?.makeKeyAndOrderFront(nil)
-                Toast.show(L("输入目标已变化，未替换；候选仍保留。", "The input target changed. Nothing was replaced; your candidate is still here."), duration: 5)
-                return
-            }
-            guard let receipt = Paster.paste(candidate, stillCurrent: { Paster.targetMatches(target) }) else {
-                self.acceptancePending = false
-                self.panel?.makeKeyAndOrderFront(nil)
-                Toast.show(L("未能安全提交替换，候选仍保留。请检查输入目标和剪贴板后重试。", "Could not safely submit the replacement. Your candidate is still here; check the input target and clipboard, then retry."), duration: 5)
-                return
-            }
-            self.finishSession()
-            Toast.show(
-                L("替换已提交，请检查原应用；可按 ⌘Z 撤销", "Replacement submitted. Check the original app; press ⌘Z to undo."),
-                duration: 4.0
-            )
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                Paster.restoreClipboard(receipt.backup, ifUnchangedSince: receipt.ownedChangeCount)
-            }
-        }
+        finishSession()
+        Toast.show(L("候选已复制。请回到原应用，确认选区后按 ⌘V 粘贴。", "Candidate copied. Return to your app, check the selection, then press ⌘V to paste."), duration: 5)
     }
 
     private func finishSession() {
-        acceptanceToken = UUID()
-        deliveryTarget = nil
         priorApp = nil
-        acceptancePending = false
         onVoiceAction = nil
         onQuickAction = nil
         let completion = onDismiss
@@ -380,7 +343,7 @@ private struct TextEnhancementView: View {
                     .font(.system(size: 19, weight: .semibold))
                     .foregroundStyle(Theme.Palette.textPrimary)
                 Spacer()
-                Label(L("确认后才替换", "Replaces only after approval"), systemImage: "checkmark.shield")
+                Label(L("复制后手动粘贴", "Copy, then paste yourself"), systemImage: "doc.on.doc")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(Theme.Palette.accent)
             }
@@ -586,7 +549,7 @@ private struct TextEnhancementView: View {
                     .font(.system(size: 10.5, design: .monospaced))
                     .foregroundStyle(Theme.Palette.textTertiary)
             }
-            Label(L("替换后可按 ⌘Z 撤销", "Press ⌘Z after replacing to undo"), systemImage: "arrow.uturn.backward")
+            Label(L("复制不会改动原文", "Copy leaves the original unchanged"), systemImage: "doc.on.doc")
                 .font(.system(size: 10.5))
                 .foregroundStyle(Theme.Palette.textTertiary)
             Spacer()
@@ -666,9 +629,9 @@ private struct TextEnhancementView: View {
 
     private var acceptButtonTitle: String {
         if model.candidate != nil, model.result?.readyForPreview == false {
-            return L("使用上一候选", "Use previous candidate")
+            return L("复制上一候选", "Copy previous candidate")
         }
-        return L("使用这版", "Use this version")
+        return L("复制候选", "Copy candidate")
     }
 
     private var completionMessage: String? {

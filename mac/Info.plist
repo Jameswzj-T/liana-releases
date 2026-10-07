@@ -11,9 +11,9 @@
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
     <key>CFBundleVersion</key>
-    <string>7</string>
+    <string>8</string>
     <key>LianaReleaseVersion</key>
-    <string>0.1.0-rc.7</string>
+    <string>0.1.0</string>
     <key>LSMinimumSystemVersion</key>
     <string>26.0</string>
     <!-- 不用 LSUIElement:它把 app 定死成"代理应用",会让运行时的 .regular 转不彻底

@@ -123,7 +123,10 @@ final class HotkeyManager {
         removeMonitors()
     }
 
-    func invalidatePendingTap() { tap?.invalidate() }
+    func invalidatePendingTap() {
+        tap?.invalidate()
+        updateReleaseCheck()
+    }
 
     private func removeMonitors() {
         if let m = globalMon { monitors.remove(m); globalMon = nil }

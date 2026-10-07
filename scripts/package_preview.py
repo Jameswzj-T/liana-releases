@@ -26,7 +26,7 @@ if sys.flags.optimize:
     raise RuntimeError('Run release checks without Python optimization (-O).')
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '0.1.0-rc.7'
+VERSION = '0.1.0'
 SPEAKER_MODEL = 'models/speaker/campplus.onnx'
 
 
@@ -212,15 +212,14 @@ def main():
         'private_history_included': False, 'clean_device_acceptance': 'not completed for this artifact',
     }, indent=2) + '\n')
     (resources / 'release-candidate-status.txt').write_text(
-        f'Liana {VERSION} early preview\nAd-hoc signed. No Developer ID signature or Apple notarization.\n'
+        f'Liana {VERSION} first release\nAd-hoc signed. No Developer ID signature or Apple notarization.\n'
         'Local-first; cloud features require explicit configuration.\n'
         'New artifact installation, system permissions and microphone acceptance remain separate checks.\n')
     (output / 'sanitize.json').write_text(json.dumps(sanitize(app), indent=2) + '\n')
     reports = output / 'reports'
     reports.mkdir()
     environment = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PYTHONDONTWRITEBYTECODE': '1',
-                   'PYTHONNOUSERSITE': '1', 'HOME': str(output / 'isolated-home')}
-    Path(environment['HOME']).mkdir()
+                   'PYTHONNOUSERSITE': '1'}
     python = brain / '.venv/bin/python'
     print('Checking runtime relocation and native library paths.', flush=True)
     run([python, ROOT / 'scripts/audit_python_relocation.py', '--expected-root', brain / '.venv',
