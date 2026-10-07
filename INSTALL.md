@@ -46,6 +46,8 @@ See [Apple's explanation of opening an app from an unknown developer](https://su
 
 Start with the default local route. It needs no Liana account or API key. **Right Option** is the new-install shortcut for selected-text rewriting: select text first, then tap it to open the panel and speak an instruction. This optional cloud text feature must be enabled and configured before requesting a rewrite; review the preview, choose Copy candidate, return to the editor, confirm the selection, and paste manually. Copying replaces clipboard contents and does not write into your editor.
 
+The Settings description still says rewriting replaces text after approval; this is outdated wording. The actual 0.1.0 preview copies a candidate only. You choose the selection and paste manually in your editor.
+
 If no text appears, check that Liana is running, both permissions are enabled, and the text field has focus. For unresolved problems, [report an issue](https://github.com/Jameswzj-T/liana-releases/issues) with your Mac chip, macOS version, target app, and the warning or behavior you saw. Do not include API keys, private text, recordings, or full logs. Security issues belong in [private vulnerability reporting](https://github.com/Jameswzj-T/liana-releases/security/advisories/new).
 
 ## Local and optional cloud features
@@ -139,6 +141,8 @@ To remove the app, quit Liana and move `Liana.app` from Applications to the Tras
 新安装默认听写热键为**右侧 Command**；若已自定义，以设置页为准。在备忘录或文本编辑的空白输入框，点一下开始说话，再点一下结束并查看落字，不用一直按住。默认本地听写无需填写任何 Key。
 
 默认**右侧 Option**用于选中文字改写：先选中文字，再点一下打开面板并说出指令，再点一下结束；预览后复制候选，回编辑器确认选区后自行粘贴。此项云端文字功能需先主动启用并配置自己的服务商 Key。
+
+设置页仍有“确认后才替换”的旧描述，这是文案问题；0.1.0 实际面板为“复制候选”，不会自动写回编辑器，需自行确认选区并粘贴。
 
 0.1.0 下载约1.09GB，模型与运行环境已包含，无需另装 Python。此版没有 Developer ID 签名和苹果公证；如果你不愿为该应用单独确认打开，请不要安装预编译包，也可查看[源码构建说明](docs/BUILDING.md)。本项目不承诺未来提供公证版。哈希一致只说明文件与发布附件一致，不代表苹果安全认证。遇到恶意软件警告、哈希不同或没有预期的打开选项时，请先停止并反馈，不尝试额外绕过命令。
 

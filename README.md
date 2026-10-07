@@ -8,6 +8,8 @@ Requires **Apple Silicon and macOS 26+**. The model and Python runtime are inclu
 
 > Ad-hoc signed, with **no Apple Developer ID signature or Apple notarization**. macOS may block first launch. Use Apple's per-app approval flow only if you trust the download; do not disable system security globally.
 
+**Known wording issue:** Settings still describes selected-text enhancement as replacing text after approval. That description is stale. In 0.1.0 the preview offers **Copy candidate**; it copies to the clipboard and leaves your editor unchanged. Return to your editor, confirm the selection, then paste manually.
+
 ## What it does
 
 - Dictate Chinese, English, or mixed-language speech into a focused macOS text field. Recognition and app compatibility vary; check the result.
@@ -53,6 +55,8 @@ Keys stay in macOS Keychain. History, vocabulary, corrections, and settings are 
 Recognition and AI cleanup can change names, numbers, times, languages, quotations, or intent. Review important content. Earlier model tests found omissions and unwanted rewriting; 0.1.0 does not claim those problems are solved or advertise an accuracy rate. Cloud tools are optional and off by default.
 
 Package checks cover locked models/dependencies, relocation, native library paths, signatures, archive integrity, and private-file exclusion. Synthetic offline tests are not a clean-device install, microphone test, physical-hotkey acceptance, or a guarantee of every editor's compatibility. New-device permissions and long-term use remain limited. History is not a document backup; disk errors can prevent persistence.
+
+On 2026-10-07, the owner reported successful testing on another Mac using the supplied no-key local startup, dictation, undo, and cancellation/recovery procedure. This is a user report, not an independently observed test or an accuracy measure. Device details and per-step observations were not separately supplied. Cloud rewriting and its full preview/copy GUI flow remain untested for this package.
 
 Keep the previous app/ZIP for rollback and quit before replacing the app; do not delete user data or stored keys. [RC6](https://github.com/Jameswzj-T/liana-releases/releases/tag/v0.1.0-rc.6) remains available. See [Release notes](releases/v0.1.0.md).
 
