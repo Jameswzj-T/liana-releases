@@ -39,10 +39,11 @@ See [Apple's explanation of opening an app from an unknown developer](https://su
 
 ## Permissions and your first dictation
 
-1. Allow **Microphone** access when requested.
-2. Allow **Accessibility** access for Liana in System Settings. Restart Liana if macOS asks you to.
-3. Open Notes or TextEdit and place the cursor in a blank text field.
-4. Tap **Right Command** once, say a short ordinary sentence, then tap it again to finish and insert text. Do not hold it down. Use the shortcut shown in Liana Settings if you have customized it.
+1. Open Liana. On its home screen, choose **Finish setup** or the gear icon to open **Settings**, then scroll to **Permissions**.
+2. Click **Grant** next to **Microphone** and respond to the macOS prompt. In 0.1.0, the app's microphone explanation may be in Chinese; it says Liana uses the microphone to transcribe your speech.
+3. Click **Grant** next to **Accessibility**, then enable the installed Liana in **System Settings → Privacy & Security → Accessibility**. Return to Liana and check that both permission rows say **Granted**. Restart Liana if macOS asks you to.
+4. Open Notes or TextEdit and place the cursor in a blank text field.
+5. Tap **Right Command** once, say a short ordinary sentence, then tap it again to finish and insert text. The default shortcut may appear as **`右⌘`** even in the English interface; this means the Command key to the right of the space bar. Do not hold it down. Keep the editor focused until the text appears. Use the shortcut shown in Liana Settings if you have customized it.
 
 Start with the default local route. It needs no Liana account or API key. **Right Option** is the new-install shortcut for selected-text rewriting: select text first, then tap it to open the panel and speak an instruction. This optional cloud text feature must be enabled and configured before requesting a rewrite; review the preview, choose Copy candidate, return to the editor, confirm the selection, and paste manually. Copying replaces clipboard contents and does not write into your editor.
 
